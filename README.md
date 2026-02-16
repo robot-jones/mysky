@@ -33,8 +33,11 @@ DIY Smart Calendar
 
 ## Initialization Script
 
+### Usage
 ```bash
-sudo ./init.sh
+sudo ./init.sh [--reset|--help]
+  --reset: Clear initialization state to start fresh
+  --help: Show this help message
 ```
 
 - The `init.sh` script needs to be run as admin (with `sudo`)
@@ -42,7 +45,6 @@ sudo ./init.sh
 - Each subsequent run picks up where the previous one left off
 - The script needs to run until it boots to the calendar in kiosk mode
 - If the script encounters an error, you might be able to find more context in the logs found in `.init/`
-- You can always delete the entire `.init/` folder if you want to restart the initialization process from the beginning.
 
 ## On the Horizon
 
