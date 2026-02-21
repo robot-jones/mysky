@@ -135,7 +135,7 @@ completeStage() {
 }
 
 stageReboot() {
-  local message=${1:-"** A reboot is required to apply changes. Please re-run the script after reboot. **"}
+  local message=${1:-"** A reboot is required **"}
   log "$YELLOW" "$message"
   read -n 1 -r -s -p "Press any key to reboot..."
   reboot
@@ -164,7 +164,7 @@ updateBootloader() {
 
 enableUsbBoot() {
   log "$BLUE" "Enabling USB boot"
-  if ! raspi-config nonint do_boot_order 4; then
+  if ! raspi-config nonint do_boot_order 0xf14; then
     failStage "usb boot configuration failed"
   fi
 }

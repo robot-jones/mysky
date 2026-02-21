@@ -2,6 +2,10 @@
 
 DIY Smart Calendar
 
+## OS
+
+Raspberry Pi OS 64-bit (trixie)
+
 ## Hardware
 
 - Raspberry Pi 4 Model B Rev 1.4 (8GB RAM)
@@ -16,9 +20,13 @@ DIY Smart Calendar
   - USB-C -> power adapter (display)
 - [Upcoming] HC-SR501 PIR motion sensor w/ jumper wires and mount
 
-## OS
+## Setup
 
-### Raspberry Pi Imager settings
+_**NOTE:** You may have to update your Pi's bootloader if it doesn't support booting from USB._
+
+### 1. Image the OS
+
+I used the Raspberry Pi Imager app on another computer to image the OS onto a USB flash drive. Here are the settings I used:
 - Model: Raspberry Pi 4
 - OS: Raspberry Pi OS 64-bit (trixie)
 - Target: USB Flash Drive
@@ -29,20 +37,25 @@ DIY Smart Calendar
 - Enable SSH
 - Enable Connect
 
-## Initialization Script
+### 2. Clone the Repo
 
-### Usage
 ```bash
-sudo ./init.sh [--reset|--help]
-  --reset: Clear initialization state to start fresh
-  --help: Show this help message
+git clone https://github.com/robot-jones/mysky.git
 ```
 
-- The `init.sh` script needs to be run as admin (with `sudo`)
-- It runs in several stages (some requiring reboot)
+### 3. Run the Initialization Script
+
+#### Things to know before you run:
+
+- The `init.sh` script needs to run as root (`sudo`)
+- It runs in several stages, some requiring a reboot
 - Each subsequent run picks up where the previous one left off
-- The script needs to run until it boots to the calendar in kiosk mode
-- If the script encounters an error, you might be able to find more context in the logs found in `.init/`
+- After the last reboot it should boot right into kiosk mode
+
+```bash
+cd mysky
+sudo ./init.sh
+```
 
 ## On the Horizon
 
