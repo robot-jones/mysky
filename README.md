@@ -16,20 +16,18 @@ DIY Smart Calendar
   - USB-C -> power adapter (display)
 - [Upcoming] HC-SR501 PIR motion sensor w/ jumper wires and mount
 
-## Image the OS
+## OS
 
-1. Download and run Raspberry Pi Imager
-2. Choose these settings
-   - model: Raspberry Pi 4
-   - OS: Raspberry Pi OS 64-bit (trixie)
-   - target: USB Flash Drive
-   - hostname: mysky
-   - username: admin
-   - set a password
-   - ccnfigure wifi
-   - enable SSH
-   - enable Connect
-3. Write the image
+### Raspberry Pi Imager settings
+- Model: Raspberry Pi 4
+- OS: Raspberry Pi OS 64-bit (trixie)
+- Target: USB Flash Drive
+- Hostname: mysky
+- Username: admin
+- Set a Password
+- Configure Wifi
+- Enable SSH
+- Enable Connect
 
 ## Initialization Script
 
