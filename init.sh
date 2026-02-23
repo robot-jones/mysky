@@ -11,9 +11,8 @@
 #   GLOBAL CONSTANTS
 # -------------------------------------
 
-OUTPUT_PATH=".init"
-LOG_FILE="$OUTPUT_PATH/logs.txt"
-STAGE_FILE="$OUTPUT_PATH/stage.txt"
+LOG_FILE=".logs"
+STAGE_FILE=".stage"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -33,10 +32,7 @@ CURRENT_STAGE=0
 
 getTimestamp() {
   date -Iseconds
-}
-
-getStageText() {
-  echo "Stage $CURRENT_STAGE"
+  # date +%s
 }
 
 # -------------------------------------
@@ -52,7 +48,7 @@ forceRoot() {
 
 reset() {
   echo -e "${YELLOW}Resetting initialization state...${NC}"
-  rm -rf .init
+  rm -f "$LOG_FILE" "$STAGE_FILE"
   echo -e "${GREEN}Initialization state reset. You can now run the script again to start fresh.${NC}"
 }
 
@@ -72,20 +68,17 @@ displayBanner() {
 log() {
   local color="${1:-$NC}"
   local message="${2:-}"
-  echo -e "${LIGHT_GRAY}$(getTimestamp)${NC} | $(getStageText) | ${color}${message}${NC}"
-  echo "$(getTimestamp) | $(getStageText) | $message" >> "$LOG_FILE"
+  echo -e "${LIGHT_GRAY}$(getTimestamp)${NC} [$CURRENT_STAGE] ${color}${message}${NC}"
+  echo "$(getTimestamp) [$CURRENT_STAGE] $message" >> "$LOG_FILE"
 }
 
 prepOutput() {
-  if [ ! -d "$OUTPUT_PATH" ]; then
-    mkdir -p "$OUTPUT_PATH"
-  fi
   if [ ! -f "$LOG_FILE" ]; then
     touch "$LOG_FILE"
   fi
   if [ ! -f "$STAGE_FILE" ]; then
     touch "$STAGE_FILE"
-    echo "$(getTimestamp) | $(getStageText) | success" >> "$STAGE_FILE"
+    echo "$(getTimestamp) [$CURRENT_STAGE] success" >> "$STAGE_FILE"
   fi
 }
 
@@ -111,10 +104,10 @@ handleArgs() {
 updateStageVariables() {
   local stage_contents=$(cat "$STAGE_FILE")
   CURRENT_STAGE=$(echo "$stage_contents" | wc -l | xargs)
-  local previous_stage_result=$(echo "$stage_contents" | tail -n 1 | cut -d'|' -f3- | xargs)
+  local previous_stage_result=$(echo "$stage_contents" | tail -n 1 | cut -d' ' -f3- | xargs)
   if [ "$previous_stage_result" != "success" ]; then
     echo -e "${RED}Initialization previously failed:${NC}"
-    echo -e "${RED}  stage: ${CURRENT_STAGE}${NC}"
+    echo -e "${RED}  stage: $((CURRENT_STAGE - 1))${NC}"
     echo -e "${RED}  message: ${previous_stage_result}${NC}"
     echo -e "${YELLOW}Please check ${LOG_FILE} for more details.${NC}"
     exit 1
@@ -123,15 +116,20 @@ updateStageVariables() {
 
 failStage() {
   local message=${1:-"Unknown error"}
-  echo "$(getTimestamp) | $(getStageText) | $message" >> "$STAGE_FILE"
-  log "$RED" "$(getStageText) failed: $message"
+  echo "$(getTimestamp) [$CURRENT_STAGE] $message" >> "$STAGE_FILE"
+  log "$RED" "Stage $CURRENT_STAGE failed: $message"
   exit 1
 }
 
 completeStage() {
-  echo "$(getTimestamp) | $(getStageText) | success" >> "$STAGE_FILE"
-  log "$GREEN" "$(getStageText) completed successfully"
+  local do_reboot=${1:-false}
+  local reboot_message=${2:-}
+  echo "$(getTimestamp) [$CURRENT_STAGE] success" >> "$STAGE_FILE"
+  log "$GREEN" "Stage $CURRENT_STAGE completed successfully"
   updateStageVariables
+  if [ "$do_reboot" = true ]; then
+    stageReboot "$reboot_message"
+  fi
 }
 
 stageReboot() {
@@ -360,48 +358,45 @@ prepOutput
 updateStageVariables
 
 if [ "$CURRENT_STAGE" -eq 1 ]; then
-  log "$BLUE" ">>> Stage 1/6: System Updates <<<"
+  log "$BLUE" "-> Stage 1/6: System Updates"
   updateSystemPackages
   updateBootloader
-  completeStage
-  stageReboot
+  completeStage true
 fi
 
 if [ "$CURRENT_STAGE" -eq 2 ]; then
-  log "$BLUE" ">>> Stage 2/6: System Configuration <<<"
+  log "$BLUE" "-> Stage 2/6: System Configuration"
   enableUsbBoot
   bootToDesktop
   useX11
   setResolution
-  completeStage
-  stageReboot
+  completeStage true
 fi
 
 if [ "$CURRENT_STAGE" -eq 3 ]; then
-  log "$BLUE" ">>> Stage 3/6: Package Installation <<<"
+  log "$BLUE" "-> Stage 3/6: Package Installation"
   installPackages
   completeStage
 fi
 
 if [ "$CURRENT_STAGE" -eq 4 ]; then
-  log "$BLUE" ">>> Stage 4/6: Optional Argon1 Installation <<<"
+  log "$BLUE" "-> Stage 4/6: Optional Argon1 Installation"
   installArgon1
   completeStage
 fi
 
 if [ "$CURRENT_STAGE" -eq 5 ]; then
-  log "$BLUE" ">>> Stage 5/6: User Configuration <<<"
+  log "$BLUE" "-> Stage 5/6: User Configuration"
   configureBash
   googleLogin
   completeStage
 fi
 
 if [ "$CURRENT_STAGE" -eq 6 ]; then
-  log "$BLUE" ">>> Stage 6/6: MySky Scripts <<<"
+  log "$BLUE" "-> Stage 6/6: MySky Scripts"
   writeKioskScript
   writeAutoStartScript
-  completeStage
-  stageReboot "Initialization complete! Rebooting into MySky calendar display..."
+  completeStage true "Initialization complete! Rebooting into MySky calendar display..."
 fi
 
 if [ "$CURRENT_STAGE" -gt 6 ]; then
