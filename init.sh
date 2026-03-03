@@ -366,7 +366,7 @@ fi
 
 if [ "$CURRENT_STAGE" -eq 2 ]; then
   log "$BLUE" "-> Stage 2/6: System Configuration"
-  enableUsbBoot
+  # enableUsbBoot
   bootToDesktop
   useX11
   setResolution

@@ -49,6 +49,7 @@ git clone https://github.com/robot-jones/mysky.git
 
 - The `init.sh` script needs to run as root (`sudo`)
 - It runs in several stages, some requiring a reboot
+- After an intermediate reboot you'll need to run it again
 - Each subsequent run picks up where the previous one left off
 - After the last reboot it should boot right into kiosk mode
 
