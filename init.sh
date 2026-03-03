@@ -225,9 +225,9 @@ installPackages() {
 
 googleLogin() {
   log "$BLUE" "Configuring Google login"
-  log "$YELLOW" "  1. Login to your Google account in the Chromium browser that opens."
-  log "$YELLOW" "  2. After logging in, close the browser to continue initialization."
-  if ! chromium --user-data-dir="/home/admin/.config/chromium-kiosk" --no-first-run "https://accounts.google.com/signin/v2/identifier?service=calendar"; then
+  echo "$YELLOW  1. Login to your Google account in the Chromium browser that opens."
+  echo "$YELLOW  2. After logging in, close the browser to continue initialization."
+  if ! chromium --user-data-dir="/home/admin/.config/chromium-kiosk" --no-first-run --no-sandbox "https://accounts.google.com/signin/v2/identifier?service=calendar"; then
     failStage "failed to open Chromium for Google login"
   fi
 }
